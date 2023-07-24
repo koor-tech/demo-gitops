@@ -1,0 +1,8 @@
+cluster_name = "koor-demo"
+ssh_public_key_file = "~/.ssh/id_rsa.pub" // new ssh key
+control_plane_vm_count=3
+initial_machinedeployment_replicas=3
+worker_type="cpx41"
+control_plane_type="cpx31"
+os="centos"
+worker_os="centos"
