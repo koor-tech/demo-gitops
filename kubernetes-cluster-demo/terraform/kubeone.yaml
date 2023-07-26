@@ -1,0 +1,18 @@
+apiVersion: kubeone.k8c.io/v1beta2
+kind: KubeOneCluster
+versions:
+  kubernetes: '1.25.6'
+cloudProvider:
+  hetzner: {}
+  external: true
+
+clusterNetwork:
+  cni:
+    external: {}
+
+addons:
+  enable: true
+  addons:
+    - name: calico-vxlan
+      params:
+        MTU: "0" # auto-detect MTU
