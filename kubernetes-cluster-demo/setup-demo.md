@@ -3,21 +3,23 @@
 This guide is to be ready and test KSD easily.
 
 ### IMPORTANT:
-In order to be able to follow all the steps you would need a Hetzner Api token, to get this you will need: 
+
+In order to be able to follow all the steps, you would need a Hetzner Api token, to get this you will need: 
 - Sign in into the Hetzner Cloud Console 
 - choose a Project
 - go to Security → API Tokens
 - generate a new token.
 
-Once you have your token you must export your token in order to use it during the process
+Once you have your token, you must export your token in order to use it during the process
 ```console 
 $ export HCLOUD_TOKEN=GlPz.....
 ```
 
 
-> If you have troubles please visit the Hetzner Cloud Documents [https://docs.hetzner.cloud/](https://docs.hetzner.cloud/)
+> If you have troubles, please visit the Hetzner Cloud Documents [https://docs.hetzner.cloud/](https://docs.hetzner.cloud/)
 
 ## Requirements
+
 - Kubeone
   - You can install it by using `curl -sfL https://get.kubeone.io | sh`
 - Terraform v1.5.2
@@ -32,18 +34,22 @@ $ export HCLOUD_TOKEN=GlPz.....
 
 ## Hands On
 
-Is time to try KSD so the first step is to have a Kubernetes cluster ready to use
+It's time to prepare your Kubernetes cluster for KSD usage.
 
 #### 1. Clone this repository
+
 ```console 
 git clone git@github.com:koor-tech/demo-gitops.git
 ```
+
 #### 2. Navigate to kubernetes-cluster-demo
+
 ```console 
 $ cd kubernetes-cluster-demo/terraform/
 ```
 
 #### 3. Initialize the terraform configuration
+
 ```console 
 $ terraform init
 
@@ -73,22 +79,27 @@ If you ever set or change modules or backend configuration for Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
+
 #### 4. Setup your cluster
+
 Inside the terraform folder you could find a file called `terraform.tfvars.example` use that file to set up your cluster as you need
 ```console
 $ cp terraform.tfvars.example terraform.tfvars
 ```
 
-KSD can run in different clusters but here are the minimum requirements expected in a production environment:
+KSD is versatile and can run on various clusters, yet in a production environment,
+the following are the essential minimum requirements:
+
  - 3 Nodes in control plane
    - 4 CPU
    - 8 GB RAM
  - 3 Nodes on data/worker nodes
    - 8 CPU
    - 16 GB RAM
- - Calico as CNI
+ - Calico as CNI (Other CNI plugins work pretty well)
 
 #### 4. Validate your changes
+
 Run `terraform plan` to examine what changes will be applied in your infrastructure
 ```console
 $ terraform plan                                                                      
@@ -108,8 +119,10 @@ hcloud_server_network.control_plane[2]: Refreshing state... [id=35048828-3137203
 hcloud_server_network.control_plane[1]: Refreshing state... [id=35048830-3137203]
 .....
 ```
+
 #### 4. Apply your changes
-This changes only will create your infrastructure and Kubernetes will be installed later
+
+These changes only will create your infrastructure and Kubernetes will be installed later
 ```console
 $ terraform apply
 
@@ -139,12 +152,16 @@ Terraform planned the following actions, but then encountered a problem:
           + source_ips      = [
           ....
 ```
+
 #### 5. Save your infrastructure
+
 You need to save your terraform state into a tf.json file that will be used later for setup your Kubernetes Clusters
 ```console
 $ terraform output -json > tf.json
 ```
+
 #### 6. Deploy your Cluster
+
 You already have a `kubeone.yaml` file with the required configuration, but you can update it as you need, and just you need to run:
 ```console
 $ kubeone apply -m kubeone.yaml -t tf.json
@@ -152,8 +169,21 @@ $ kubeone apply -m kubeone.yaml -t tf.json
 
 ####  7. Add your volumes
 
-####  8. Install KSD
+For this step, you will need to access to your hetzner cloud account [https://accounts.hetzner.com/login](https://accounts.hetzner.com/login)
 
-####  9. Verify your Ceph Cluster
+1. Access to your hetzner cloud account
+2. Open your project
+3. Go to volumes and add a new volume of your desire size
+4. Set the volume name 
+5. Choose the server 
+   - **important: Choose one server that contains in its name "pool" to use nodes from the data plane**
+   - Caution: Avoid selecting control plane nodes for KSD, as it relies on deploying pods tied to the volumes. Control plane nodes are unable to host such pods due to [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+6. Select in *Choose mount options*, **manually** to be able to manage completely by KSD
+7. Finally, click on create and buy
+8. We recommended setting at least one volume per node to be able to use all the KSD features
 
-####  10. Deploy your app that you needs
+See the image to check how to do that
+
+![how to create a volume](how-to-create-volume.gif)
+
+With the steps above, you will have readied your minimum production Kubernetes Cluster to be used to deploy KSD 
