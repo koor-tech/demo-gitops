@@ -20,7 +20,6 @@ if ! command -v kubectl &> /dev/null; then
     echo "kubectl is not installed please go to https://kubernetes.io/docs/tasks/tools/ and install it"
 else
    echo -e "Kubectl: \033[32m✔️\033[0m" 
-
 fi
 
 # Initialize the Terraform project
@@ -125,3 +124,4 @@ run() {
 }
 
 run
+
