@@ -61,3 +61,19 @@ I like using a naming convention for the aliases. Starting with a common root, l
 For example, demo-cp1, demo-data1, demo-data2...
 
 You might set the hostnames to match - that would be reassuring.
+
+### Update everything
+
+I installed Ubuntu 22.04. Whatever you installed, you'll want to make sure everything is up to date.
+
+```bash
+sudo update && sudo upgrade -y
+```
+
+When that's over, you may need to reboot the system for important changes to take effect. Do this:
+
+```bash
+sudo shutdown -r now
+```
+
+That will kick you out of your session because the server is rebooting. Won't take but a few seconds. Count to 10, and ssh back in.
