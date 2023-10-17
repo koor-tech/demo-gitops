@@ -12,7 +12,7 @@ In this example, we will demonstrate an automated environment configuration to s
 
 ### 1. Deploy your Kubernetes Cluster in Hetzner Cloud
 
-Read how you can [install your Kubernetes Cluster to use KSD](kubernetes-cluster-demo/setup-demo.md)
+Read how you can [install your Kubernetes Cluster to use KSD](kubernetes-cluster-demo/docs/setup-demo.md)
 
 
 
