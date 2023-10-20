@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: koor-release
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  provider: generic
+  timeout: 1m0s
+  url: https://charts.koor.tech/release
