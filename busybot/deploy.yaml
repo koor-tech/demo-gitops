@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: busybot-cephfs-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 11Gi
+  storageClassName: ceph-filesystem
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: busybot
+spec:
+  schedule: "*/2 * * * *"
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:          
+      labels:
+        app: busybot
+        cron: busybot
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: alpine:3.18.4
+            imagePullPolicy: IfNotPresent
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 100Mi
+            env:
+            - name: STORE
+              value: /store
+            - name: COUNT
+              value: "5"
+            - name: SIZE
+              value: 50M
+            volumeMounts:
+            - name: busybot-store
+              mountPath: /store
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Read $COUNT random files from store and calculate md5
+              ls $STORE | shuf -n $COUNT | while read file
+              do
+                echo Reading $file
+                md5sum $STORE/$file
+              done
+
+              # Write $COUNT random files from store and calculate md5
+              shuf -n $COUNT -i 0-99 | while read file
+              do
+                filename=$(printf "%02d" $file)
+                echo Writing $filename
+                dd if=/dev/urandom of=$STORE/$filename bs=$SIZE count=1
+              done
+          restartPolicy: Never
+          volumes:
+          - name: busybot-store
+            persistentVolumeClaim:
+              claimName: busybot-cephfs-pvc
+              readOnly: false
