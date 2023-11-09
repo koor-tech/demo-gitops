@@ -40,6 +40,8 @@ spec:
               value: /store
             - name: COUNT
               value: "5"
+            - name: DEL_COUNT
+              value: "5"
             - name: SIZE
               value: 50M
             volumeMounts:
@@ -56,12 +58,19 @@ spec:
                 md5sum $STORE/$file
               done
 
-              # Write $COUNT random files from store and calculate md5
+              # Write $COUNT random files from store
               shuf -n $COUNT -i 0-99 | while read file
               do
                 filename=$(printf "%02d" $file)
                 echo Writing $filename
                 dd if=/dev/urandom of=$STORE/$filename bs=$SIZE count=1
+              done
+
+              # Delete $DEL_COUNT random files from store
+              ls $STORE | shuf -n $DEL_COUNT | while read file
+              do
+                echo Deleting $file
+                rm $STORE/$file
               done
           restartPolicy: Never
           volumes:
