@@ -41,7 +41,7 @@ spec:
             resources:
               limits:
                 cpu: 1000m
-                memory: 100Mi
+                memory: 1000Mi
             env:
             - name: STORE
               value: /store
