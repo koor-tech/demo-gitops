@@ -35,13 +35,9 @@ spec:
       template:
         spec:
           containers:
-          - name: hello
+          - name: busybot-cont
             image: alpine:3.18.4
             imagePullPolicy: IfNotPresent
-            resources:
-              limits:
-                cpu: 1000m
-                memory: 1000Mi
             env:
             - name: STORE
               value: /store
@@ -58,6 +54,10 @@ spec:
             - /bin/sh
             - -c
             - |
+              
+              echo Reading directory
+              echo "Number of files: $(ls $STORE | wc -l)"
+              
               # Read $COUNT random files from store and calculate md5
               ls $STORE | shuf -n $COUNT | while read file
               do
