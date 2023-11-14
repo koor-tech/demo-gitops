@@ -22,7 +22,7 @@ metadata:
   name: busybot
   namespace: busybot
 spec:
-  schedule: "*/2 * * * *"
+  schedule: "* * * * *"
   successfulJobsHistoryLimit: 5
   failedJobsHistoryLimit: 5
   concurrencyPolicy: Forbid
@@ -61,16 +61,17 @@ spec:
               # Read $COUNT random files from store and calculate md5
               ls $STORE | shuf -n $COUNT | while read file
               do
-                echo Reading $file
                 md5sum $STORE/$file
               done
 
               # Write $COUNT random files from store
               shuf -n $COUNT -i 0-99 | while read file
               do
-                filename=$(printf "%02d" $file)
+                dd if=/dev/urandom of=/tmp/file bs=$SIZE count=1
+                md5=$(md5sum /tmp/file | awk '{ print $1 }')
+                filename=$(printf "%02d-%s" $file $md5)
                 echo Writing $filename
-                dd if=/dev/urandom of=$STORE/$filename bs=$SIZE count=1
+                mv /tmp/file $STORE/$filename
               done
 
               # Delete $DEL_COUNT random files from store
