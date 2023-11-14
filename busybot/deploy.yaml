@@ -23,9 +23,9 @@ metadata:
   namespace: busybot
 spec:
   schedule: "* * * * *"
-  successfulJobsHistoryLimit: 5
+  successfulJobsHistoryLimit: 10
   failedJobsHistoryLimit: 5
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Replace
   jobTemplate:
     metadata:          
       labels:
@@ -69,9 +69,10 @@ spec:
               do
                 dd if=/dev/urandom of=/tmp/file bs=$SIZE count=1
                 md5=$(md5sum /tmp/file | awk '{ print $1 }')
-                filename=$(printf "%02d-%s" $file $md5)
+                filename=$(printf "%02d" $file)
                 echo Writing $filename
-                mv /tmp/file $STORE/$filename
+                rm -f $STORE/$filename-*
+                mv /tmp/file $STORE/$filename-$md5
               done
 
               # Delete $DEL_COUNT random files from store
