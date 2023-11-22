@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: koor-ceph-cluster
+  namespace: koor-ceph
+spec:
+  chart:
+    spec:
+      chart: rook-ceph-cluster
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: koor-release
+      version: '*'
+  interval: 1m0s
+  suspend: true

@@ -6,13 +6,13 @@ metadata:
 spec:
   chart:
     spec:
-      chart: koor-release
+      chart: rook-ceph
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: koor-release
       version: v1.12.0
-  interval: 30m
+  interval: 1m0s
   timeout: 10m
   install:
     remediation:
