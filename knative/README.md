@@ -18,5 +18,9 @@ kn func version
 ## Create kantive function
 ```bash
 kn func create -l go hello
-
+cd hello
+kn func build --registry docker.io/<your_registry>
+kn func run
+kn func deploy
+kn func invoke
 ```
