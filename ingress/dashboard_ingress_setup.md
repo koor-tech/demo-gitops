@@ -134,7 +134,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: koor-dashboard-demo
-  namespace: koor-operator # namespace:cluster
+  namespace: rook-ceph # namespace:cluster
   annotations:
     cert-manager.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -175,7 +175,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: koor-dashboard-demo-ceph
-  namespace: koor-operator # namespace:cluster
+  namespace: rook-ceph # namespace:cluster
   annotations:
     cert-manager.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
