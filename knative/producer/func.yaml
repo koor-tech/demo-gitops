@@ -2,3 +2,8 @@ specVersion: 0.35.0
 name: producer
 runtime: go
 created: 2023-12-13T00:38:54.564292994-05:00
+run:
+  volumes:
+  - presistentVolumeClaim:
+      claimName: knative-pc-cephfs
+    path: /files

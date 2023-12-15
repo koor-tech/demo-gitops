@@ -18,3 +18,6 @@ spec:
       "knative-staging.koor.tech": ""
     network:
       ingress-class: "kourier.ingress.networking.knative.dev"
+    features:
+      kubernetes.podspec-persistent-volume-claim: "enabled"
+      kubernetes.podspec-persistent-volume-write: "enabled"
