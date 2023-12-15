@@ -1,9 +1,18 @@
 # Knative integration
 
+Idea: File buffer using producer and consumer
+Producer creates files with random sizes. Limited to a number of files.
+Consumer picks random file, calculates md5 and size then deletes the file, sends that to output.
+
+This could be intermediate files in your image processing pipeline or [find applications]
+
 ## Install knative operator
 ```bash
-kubectl apply -f operator.yaml
-kubectl apply -f serving.yaml
+kubectl apply -f deploy/operator.yaml
+kubectl apply -f deploy/serving.yaml
+kubectl patch service/kourier \
+    -n knative-serving \
+    --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-staging-kourier" }}}'
 
 ```
 
@@ -15,12 +24,34 @@ sudo mv kn-func /usr/local/bin
 kn func version
 ```
 
+## Create pvc and namespace
+```bash
+kubectl apply -f deploy/namespace.yaml
+kubectl apply -f deploy/pvc.yaml
+```
+
 ## Create kantive function
 ```bash
-kn func create -l go hello
-cd hello
-kn func build --registry docker.io/<your_registry>
-kn func run
+kn func create -l go producer
+kn func create -l go consumer
+```
+
+## Fill in code
+...
+
+## Enable PVC usage and configure the functions to use the pvc
+
+
+## Build and push kantive function
+```bash
+cd producer
+kn func build --registry docker.io/<your_username>
 kn func deploy
-kn func invoke
+```
+do the same for consumer.
+
+## Invoke function
+```console
+$ kn func invoke
+TODO result
 ```
