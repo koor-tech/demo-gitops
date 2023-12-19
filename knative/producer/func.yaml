@@ -1,9 +1,16 @@
 specVersion: 0.35.0
 name: producer
 runtime: go
+registry: docker.io/zuhairkoor
+image: docker.io/zuhairkoor/producer:latest
+imageDigest: sha256:c17987414b33618cf2490ae23e31280dd5a68dd0a6a4571e71288380fe0efe02
 created: 2023-12-13T00:38:54.564292994-05:00
+build:
+  builder: pack
 run:
   volumes:
   - presistentVolumeClaim:
       claimName: knative-pc-cephfs
     path: /files
+deploy:
+  namespace: default
