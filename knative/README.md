@@ -24,16 +24,16 @@ sudo mv kn-func /usr/local/bin
 kn func version
 ```
 
-## Create pvc and namespace
+## Create pvc
 ```bash
-kubectl apply -f deploy/namespace.yaml
 kubectl apply -f deploy/pvc.yaml
 ```
 
-## Create kantive function
+## Create kantive functions
 ```bash
 kn func create -l go producer
 kn func create -l go consumer
+kn func create -l go list
 ```
 
 ## Fill in code
@@ -74,4 +74,11 @@ do the same for consumer.
 ```console
 $ kn func invoke
 TODO result
+```
+
+## Undeploy function
+```console
+$ kn func delete consumer
+Removing Knative Service: consumer
+Removing Knative Service 'consumer' and all dependent resources
 ```

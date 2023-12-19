@@ -2,40 +2,63 @@ package function
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
+	"math/rand"
 	"net/http"
-	"strings"
+	"os"
 )
+
+const FILES_DIR = "/files"
 
 // Handle an HTTP Request.
 func Handle(ctx context.Context, res http.ResponseWriter, req *http.Request) {
-	/*
-	 * YOUR CODE HERE
-	 *
-	 * Try running `go test`.  Add more test as you code in `handle_test.go`.
-	 */
+	fmt.Println("Reading directory")
+	files, err := os.ReadDir(FILES_DIR)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		fmt.Fprint(res, "Error reading files directory")
+		return
+	}
+	fmt.Printf("Found %d files\n", len(files))
 
-	fmt.Println("Received request")
-	fmt.Println(prettyPrint(req))      // echo to local output
-	fmt.Fprintf(res, prettyPrint(req)) // echo to caller
-}
-
-func prettyPrint(req *http.Request) string {
-	b := &strings.Builder{}
-	fmt.Fprintf(b, "%v %v %v %v\n", req.Method, req.URL, req.Proto, req.Host)
-	for k, vv := range req.Header {
-		for _, v := range vv {
-			fmt.Fprintf(b, "  %v: %v\n", k, v)
-		}
+	if len(files) == 0 {
+		msg := "No files to consume"
+		fmt.Println(msg)
+		fmt.Fprint(res, msg)
+		return
 	}
 
-	if req.Method == "POST" {
-		req.ParseForm()
-		fmt.Fprintln(b, "Body:")
-		for k, v := range req.Form {
-			fmt.Fprintf(b, "  %v: %v\n", k, v)
-		}
+	// Choose a random file
+	fileEntry := files[rand.Intn(len(files))]
+	fileName := fileEntry.Name()
+	filePath := FILES_DIR + "/" + fileName
+
+	fmt.Printf("Reading file %s\n", fileName)
+	contents, err := os.ReadFile(filePath)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		fmt.Fprintf(res, "Error reading file %s", fileName)
+		return
 	}
 
-	return b.String()
+	fileSize := len(contents)
+	fmt.Printf("Read %d bytes\n", fileSize)
+
+	md5sum := md5.Sum(contents)
+	fmt.Printf("The md5 sum is %x\n", md5sum)
+
+	fmt.Printf("Removing file %s\n", fileName)
+	err = os.Remove(filePath)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		fmt.Fprintf(res, "Error removing file %s", fileName)
+		return
+	}
+	fmt.Println("File removed")
+
+	fmt.Fprintf(res, "Consumed file %s \nFile size is %d \nThe md5 sum is %x", fileName, fileSize, md5sum)
 }

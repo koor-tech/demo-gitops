@@ -1,20 +1,5 @@
-# Go HTTP Function
-
-Welcome to your new Go Function! The boilerplate function code can be found in
-[`handle.go`](handle.go). This Function responds to HTTP requests.
-
-## Development
-
-Develop new features by adding a test to [`handle_test.go`](handle_test.go) for
-each feature, and confirm it works with `go test`.
-
-Update the running analog of the function using the `func` CLI or client
-library, and it can be invoked from your browser or from the command line:
-
-```console
-curl http://myfunction.example.com/
-```
-
-For more, see [the complete documentation]('https://github.com/knative/func/tree/main/docs')
-
-
+# Producer function
+When called, this function:
+1. Creates a file with a size between 5 and 15 MB and fills it with random data
+2. Calculates md5 and uses it as a file name
+3. Outputs file name, size and md5
