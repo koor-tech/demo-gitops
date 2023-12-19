@@ -40,7 +40,27 @@ kn func create -l go consumer
 ...
 
 ## Enable PVC usage and configure the functions to use the pvc
+https://knative.dev/docs/serving/configuration/feature-flags/#kubernetes-persistentvolumeclaim-pvc
 
+```yaml
+    features:
+      kubernetes.podspec-persistent-volume-claim: "enabled"
+      kubernetes.podspec-persistent-volume-write: "enabled"
+```
+
+## Add pvc to funcs
+```bash
+kn func config volumes add
+```
+
+or add this to `func.yaml`
+```bash
+run:
+  volumes:
+  - presistentVolumeClaim:
+      claimName: knative-pc-cephfs
+    path: /files
+```
 
 ## Build and push kantive function
 ```bash
