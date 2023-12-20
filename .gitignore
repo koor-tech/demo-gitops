@@ -35,3 +35,7 @@ terraform.rc
 
 # Generated tf.json
 tf.json
+
+# Generated from kubeone
+koor-demo-*-kubeconfig
+koor-demo-*.tar.gz
