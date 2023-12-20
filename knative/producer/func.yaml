@@ -3,7 +3,7 @@ name: producer
 runtime: go
 registry: docker.io/zuhairkoor
 image: docker.io/zuhairkoor/producer:latest
-imageDigest: sha256:c17987414b33618cf2490ae23e31280dd5a68dd0a6a4571e71288380fe0efe02
+imageDigest: sha256:3c512a3390b26d5f9259b329e2d9d5316d4dfe9f6eb38c8a4e0c61388394c9e4
 created: 2023-12-13T00:38:54.564292994-05:00
 build:
   builder: pack

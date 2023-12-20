@@ -3,7 +3,7 @@ name: list
 runtime: go
 registry: docker.io/zuhairkoor
 image: docker.io/zuhairkoor/list:latest
-imageDigest: sha256:be980eef1d2008e7bf8b308051824d1048698e239d8986554ff3e08b66ff385d
+imageDigest: sha256:62b1a99f81cde6454ace5433e8eb2c142fc35a947af6162cbd304c1e5d11b622
 created: 2023-12-19T00:25:46.352372057-05:00
 build:
   builder: pack

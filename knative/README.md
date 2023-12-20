@@ -46,6 +46,7 @@ https://knative.dev/docs/serving/configuration/feature-flags/#kubernetes-persist
     features:
       kubernetes.podspec-persistent-volume-claim: "enabled"
       kubernetes.podspec-persistent-volume-write: "enabled"
+      kubernetes.podspec-securitycontext: "enabled"
 ```
 
 ## Add pvc to funcs
@@ -67,6 +68,10 @@ run:
 cd producer
 kn func build --registry docker.io/<your_username>
 kn func deploy
+
+# this is to fix permission issues
+kubectl patch services.serving/producer --type merge \
+    -p '{"spec": {"template": {"spec": {"securityContext": {"fsGroup":1000}}}}}'
 ```
 do the same for consumer.
 

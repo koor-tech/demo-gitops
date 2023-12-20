@@ -3,7 +3,7 @@ name: consumer
 runtime: go
 registry: docker.io/zuhairkoor
 image: docker.io/zuhairkoor/consumer:latest
-imageDigest: sha256:59ddd4ac3fedeb78e7e6a68d0908dae7edc84d3c0f7732c25a92d4f10e9088d0
+imageDigest: sha256:d671445b1eb0feba973cbdd5ddb3f186789ddf96ab675670070c809266c991ac
 created: 2023-12-13T00:39:05.888786906-05:00
 build:
   builder: pack
