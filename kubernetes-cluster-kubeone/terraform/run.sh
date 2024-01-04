@@ -37,18 +37,59 @@ else
 fi
 
 # Extract and check ssh_public_key_file value
-ssh_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+ssh_public_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
-ssh_key_file="${ssh_key_file/#\~/$HOME}"
+ssh_public_key_file="${ssh_public_key_file/#\~/$HOME}"
 
 
-if ! [ -f "$ssh_key_file" ]; then
-    echo "Error: SSH public key file '$ssh_key_file' not found."
+if ! [ -f "$ssh_public_key_file" ]; then
+    echo "Error: SSH public key file '$ssh_public_key_file' not found."
     echo "Please make sure the file exists and has appropriate permissions"
     exit 1
 else
-    echo -e "Using ssh: \033[32m$ssh_key_file\033[0m"
+    echo -e "Using ssh: \033[32m$ssh_public_key_file\033[0m"
     echo -e "== Please make sure that this key is unique in your Hetzner Cloud account === \n"
+fi
+
+# Extract and check ssh_private_key_file value
+ssh_private_key_file=$(grep -E "^ssh_private_key_file" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+ssh_private_key_file="${ssh_private_key_file/#\~/$HOME}"
+
+# Check whether an ssh-agent is listening
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    echo "ssh-agent isn't running."
+
+    # Start ssh-agent
+    # NOTE/TODO: The agent sicks around, but only listens to the bash instance launched by the script.
+    # If further interactions with the agent are required (someone exiting the script and proceeding
+    # with the rest of the install on their own), the agent sticks around, but isn't listening to any-
+    # one unless they explicitly export SSH_AUTH_SOCK to the /tmp/ssh-..../agent.... value printed below.
+    eval "$(ssh-agent -s)"
+
+    echo "SSH_AGENT_PID: $SSH_AGENT_PID"
+    echo "SSH_AUTH_SOCK: $SSH_AUTH_SOCK"
+
+    # Check if the private key file exists
+    if [ ! -f "$ssh_private_key_file" ]; then
+        echo "Error: Private key file not found at $ssh_private_key_file"
+        exit 1
+    fi
+
+    # Add private key to ssh-agent
+    ssh-add -v "$ssh_private_key_file"
+
+    echo "Private key added to ssh-agent."
+else
+    echo "ssh-agent is currently running."
+
+    # Ensure private key is added to ssh-agent
+    if ! ssh-add -l | grep -qF "$ssh_private_key_file"; then
+        echo "Private key is not in ssh-agent. Adding it now."
+        ssh-add "$ssh_private_key_file"
+    else
+        echo "Private key is already in ssh-agent."
+    fi
 fi
 
 # Show a summary of the Terraform variables
