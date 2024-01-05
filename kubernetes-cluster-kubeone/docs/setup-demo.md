@@ -1,51 +1,60 @@
 ## Setup a Kubernetes Cluster for KSD using Hetzner Cloud
 
-This guide is to be ready and test KSD easily.
+This document will walk you through the steps required to set up a Kubernetes cluster in the Hetzner Cloud for use with KSD.
 
 ### IMPORTANT:
 
-In order to be able to follow all the steps, you would need a Hetzner Api token, to get this you will need: 
-- Sign in into the Hetzner Cloud Console 
-- choose a Project
-- go to Security → API Tokens
-- generate a new token.
+To follow this guide, you will need a Hetzner API token.  To generate this you will need to: 
+- Sign in into the [Hetzner Cloud Console](https://console.hetzner.cloud/)
+- Select your project
+- Go to Security → API Tokens
+- Generate a new token
 
-Once you have your token, you must export your token in order to use it during the process
+Once you have your token, export it to your shell's environment:
 ```console 
 $ export HCLOUD_TOKEN=GlPz.....
 ```
 
 
-> If you have troubles, please visit the Hetzner Cloud Documents [https://docs.hetzner.cloud/](https://docs.hetzner.cloud/)
+> If you have trouble, please visit the [Hetzner Cloud documentation](https://docs.hetzner.cloud/) site.
 
 ## Requirements
 
-- Kubeone
-  - You can install it by using `curl -sfL https://get.kubeone.io | sh`
-- Terraform v1.5.2
-- A new ssh key only for this purpose (how to generate a new ssh-key)
-- Kubectl (how to install kubectl)
-- Api Token Hetzner Cloud
+- Kubeone v1.6.2
+  - AMD64 and ARM64 binaries can be found on [Kubermatic's GitHub page](https://github.com/kubermatic/kubeone/releases).
+- Terraform v1.5.2 or greater
+    - Various installation methods can be found on [Hashicorph's installation page](https://developer.hashicorp.com/terraform/install).
+- A new ssh key generated for this project
+    - This can be created by running `ssh-keygen` on your console.  When prompted, enter a name and a location for the new key pair.
+- Kubectl
+    - Various installation methods can be found in the [Kubernetes installation guide](https://kubernetes.io/docs/tasks/tools/).
+- A Hetzner Cloud API token
+- `ssh-agent` running in your shell
+    - On your console, run the following:
+        ```console
+        $ eval `ssh-agent -s`
+        $ ssh-add /path/to/private/key
+        ```
 
 
 ## Architecture
 
-![architecture.png](architecture.png)
+![architecture.png](../architecture.png)
 
 ## Hands On
 
 It's time to prepare your Kubernetes cluster for KSD usage.
 
-#### 1. Clone this repository
+#### 1. Clone the Koor demonstration repository
 
 ```console 
 git clone git@github.com:koor-tech/demo-gitops.git
 ```
 
-#### 2. Navigate to kubernetes-cluster-kubeone
+#### 2. Navigate to the terraform directory beneath kubernetes-cluster-kubeone
 
 ```console 
-$ cd kubernetes-cluster-kubeone/terraform/
+$ cd demo-gitops/kubernetes-cluster-kubeone/terraform
 ```
 
 #### 3. Initialize the terraform configuration
@@ -82,25 +91,34 @@ commands will detect it and remind you to do so if necessary.
 
 #### 4. Setup your cluster
 
-Inside the terraform folder you could find a file called `terraform.tfvars.example` use that file to set up your cluster as you need
+In the terraform directory, copy the `terraform.tfvars.example` file to `terraform.tfvars`, and modify the values to describe your cluster:
 ```console
 $ cp terraform.tfvars.example terraform.tfvars
 ```
+```source
+cluster_name = "koor-demo"
+ssh_public_key_file = "~/.ssh/id_rsa.pub"
+control_plane_vm_count=3
+initial_machinedeployment_replicas=3
+worker_type="cpx41"
+control_plane_type="cpx31"
+os="ubuntu"
+worker_os="ubuntu"
+```
 
-KSD is versatile and can run on various clusters, yet in a production environment,
-the following are the essential minimum requirements:
+KSD is versatile, and can run on many different cluster configurations.  For a production environment, these are the minimum requirements:
 
- - 3 Nodes in control plane
+ - 3 control plane nodes
    - 4 CPU
    - 8 GB RAM
- - 3 Nodes on data/worker nodes
+ - 3 data/worker nodes
    - 8 CPU
    - 16 GB RAM
- - Calico as CNI (Other CNI plugins work pretty well)
+ - Calico as the CNI.  Other CNI plugins work as well, but haven't been as extensively tested.
 
 #### 4. Validate your changes
 
-Run `terraform plan` to examine what changes will be applied in your infrastructure
+Run `terraform plan` to see what changes will be applied to your infrastructure:
 ```console
 $ terraform plan                                                                      
 hcloud_placement_group.control_plane: Refreshing state... [id=185187]
@@ -122,7 +140,7 @@ hcloud_server_network.control_plane[1]: Refreshing state... [id=35048830-3137203
 
 #### 4. Apply your changes
 
-These changes only will create your infrastructure and Kubernetes will be installed later
+Once you're happy with the proposed changes, apply them to create your infrastructure.  Kubernetes will be installed later.
 ```console
 $ terraform apply
 
@@ -155,35 +173,57 @@ Terraform planned the following actions, but then encountered a problem:
 
 #### 5. Save your infrastructure
 
-You need to save your terraform state into a tf.json file that will be used later for setup your Kubernetes Clusters
+Save the generated terraform state to a file.  This will be used in the next step to stand up the Kubernetes cluster:
 ```console
-$ terraform output -json > tf.json
+$ terraform output -json -no-color > tf.json
 ```
 
 #### 6. Deploy your Cluster
 
-You already have a `kubeone.yaml` file with the required configuration, but you can update it as you need, and just you need to run:
+The `kubeone.yaml` file in the terraform directory already has all necessary configuration details, but you can modify it to meet your requirements.  
+
+Once you're ready, run:
 ```console
 $ kubeone apply -m kubeone.yaml -t tf.json
+INFO[17:31:59 UTC] Determine hostname...
+INFO[17:32:03 UTC] Determine operating system...
+INFO[17:32:04 UTC] Running host probes...
+The following actions will be taken:
+Run with --verbose flag for more information.
+	+ initialize control plane node "koor-demo-test-ian-control-plane-1" (192.168.0.3) using 1.25.6
+	+ join control plane node "koor-demo-test-ian-control-plane-2" (192.168.0.4) using 1.25.6
+	+ ensure machinedeployment "koor-demo-test-ian-pool1" with 4 replica(s) exists
+	+ apply embedded addons
+Do you want to proceed (yes/no): yes
+
+INFO[17:32:31 UTC] Determine hostname...
+INFO[17:32:31 UTC] Determine operating system...
+INFO[17:32:31 UTC] Running host probes...
+INFO[17:32:32 UTC] Installing prerequisites...
+INFO[17:32:32 UTC] Creating environment file...                  node=1.2.3.4 os=ubuntu
+INFO[17:32:32 UTC] Creating environment file...                  node=5.6.7.8 os=ubuntu
+INFO[17:32:33 UTC] Configuring proxy...                          node=1.2.3.4 os=ubuntu
+INFO[17:32:33 UTC] Installing kubeadm...                         node=1.2.3.4 os=ubuntu
+INFO[17:32:33 UTC] Configuring proxy...                          node=5.6.7.8 os=ubuntu
+INFO[17:32:33 UTC] Installing kubeadm...                         node=5.6.7.8 os=ubuntu
 ```
 
 ####  7. Add your volumes
 
-For this step, you will need to access to your hetzner cloud account [https://accounts.hetzner.com/login](https://accounts.hetzner.com/login)
+For this step, you will need to access to your [Hetzner Cloud account](https://accounts.hetzner.com/login).
 
-1. Access to your hetzner cloud account
+>To utilize all of KSD's features, we recommend associating at least one volume with each data plane node.
+1. Navigate to the [Hetzner Cloud console](https://console.hetzner.cloud/)
 2. Open your project
-3. Go to volumes and add a new volume of your desire size
-4. Set the volume name 
-5. Choose the server 
-   - **important: Choose one server that contains in its name "pool" to use nodes from the data plane**
-   - Caution: Avoid selecting control plane nodes for KSD, as it relies on deploying pods tied to the volumes. Control plane nodes are unable to host such pods due to [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
-6. Select in *Choose mount options*, **manually** to be able to manage completely by KSD
+3. Go to the volumes tab in the sidebar
+4. Set the volume size and name
+5. Choose a data plane node to tie the volume to 
+   - **Important:** Data plane nodes have the word "pool" in their names.
+   - **Caution:** Do not associate volumes to KSD control plane nodes.  KSD works by deploying pods on the data plane nodes tied to your volumes. Control plane nodes are unable to host those pods themselves due to [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+6. Set the *Choose mount options* slider to **manually** so that your cluster has raw block devices to consume.  You'll receive a warning, which can be dismissed.
 7. Finally, click on create and buy
-8. We recommended setting at least one volume per node to be able to use all the KSD features
+![how to create a volume](../how-to-create-volume.gif)
 
-See the image to check how to do that
+Congratulations!  You have created a minimal production Kubernetes Cluster that can now be used to deploy KSD. 
 
-![how to create a volume](how-to-create-volume.gif)
-
-With the steps above, you will have readied your minimum production Kubernetes Cluster to be used to deploy KSD 
+>Note: To _destroy_ your cluster, detach all volumes from your worker nodes, delete them, thens navigate to the `demo-gitops/kubernetes-cluster-kubeone/terraform` directory, and run `terraform apply -destroy`.
