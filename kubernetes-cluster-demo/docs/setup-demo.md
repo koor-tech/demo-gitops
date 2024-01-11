@@ -26,6 +26,8 @@ $ export HCLOUD_TOKEN=GlPz.....
 - A new ssh key only for this purpose (how to generate a new ssh-key)
 - Kubectl (how to install kubectl)
 - Api Token Hetzner Cloud
+- Hetzner's hcloud python library
+  - `$ pip3 install hcloud`
 
 
 ## Architecture
