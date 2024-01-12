@@ -44,10 +44,10 @@ It's time to prepare your Kubernetes cluster for KSD usage.
 git clone git@github.com:koor-tech/demo-gitops.git
 ```
 
-#### 2. Navigate to kubernetes-cluster-demo
+#### 2. Navigate to kubernetes-cluster-kubeone
 
 ```console 
-$ cd kubernetes-cluster-demo/terraform/
+$ cd kubernetes-cluster-kubeone/terraform/
 ```
 
 #### 3. Initialize the terraform configuration
