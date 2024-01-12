@@ -41,6 +41,8 @@ ssh_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= '{gsub(
 
 ssh_key_file="${ssh_key_file/#\~/$HOME}"
 
+# Extract worker volume size
+worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars.example | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 if ! [ -f "$ssh_key_file" ]; then
     echo "Error: SSH public key file '$ssh_key_file' not found."
@@ -115,6 +117,10 @@ run() {
             kubeconfig
             run
             ;;                   
+        6)  # assign volumes
+            echo "Assigning volumes to worker nodes."
+            ./volumizer -c ${cluster_name} -s ${worker_volume_size}
+            ;;
         *)
             echo "Invalid exiting..."
             echo "The script has finished."

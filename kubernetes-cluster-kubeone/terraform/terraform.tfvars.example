@@ -6,3 +6,4 @@ worker_type="cpx41"
 control_plane_type="cpx31"
 os="ubuntu"
 worker_os="ubuntu"
+worker_volume_size=10
