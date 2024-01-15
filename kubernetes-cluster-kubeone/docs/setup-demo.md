@@ -1,6 +1,6 @@
-## Setup a Kubernetes Cluster for KSD using Hetzner Cloud
+## Setup a Kubernetes Cluster for Rook using Hetzner Cloud
 
-This document will walk you through the steps required to set up a Kubernetes cluster in the Hetzner Cloud for use with KSD.
+This document will walk you through the steps required to set up a Kubernetes cluster in the Hetzner Cloud for use with Rook.
 
 ### IMPORTANT:
 
@@ -43,7 +43,7 @@ $ export HCLOUD_TOKEN=GlPz.....
 
 ## Hands On
 
-It's time to prepare your Kubernetes cluster for KSD usage.
+It's time to prepare your Kubernetes cluster for Rook usage.
 
 #### 1. Clone the Koor demonstration repository
 
@@ -106,7 +106,7 @@ os="ubuntu"
 worker_os="ubuntu"
 ```
 
-KSD is versatile, and can run on many different cluster configurations.  For a production environment, these are the minimum requirements:
+Rook is versatile, and can run on many different cluster configurations.  For a production environment, these are the minimum requirements:
 
  - 3 control plane nodes
    - 4 CPU
@@ -212,18 +212,18 @@ INFO[17:32:33 UTC] Installing kubeadm...                         node=5.6.7.8 os
 
 For this step, you will need to access to your [Hetzner Cloud account](https://accounts.hetzner.com/login).
 
->To utilize all of KSD's features, we recommend associating at least one volume with each data plane node.
+>To utilize all of Rook's features, we recommend associating at least one volume with each data plane node.
 1. Navigate to the [Hetzner Cloud console](https://console.hetzner.cloud/)
 2. Open your project
 3. Go to the volumes tab in the sidebar
 4. Set the volume size and name
 5. Choose a data plane node to tie the volume to 
    - **Important:** Data plane nodes have the word "pool" in their names.
-   - **Caution:** Do not associate volumes to KSD control plane nodes.  KSD works by deploying pods on the data plane nodes tied to your volumes. Control plane nodes are unable to host those pods themselves due to [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+   - **Caution:** Do not associate volumes to Rook control plane nodes.  Rook works by deploying pods on the data plane nodes tied to your volumes. Control plane nodes are unable to host those pods themselves due to [taints and tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
 6. Set the *Choose mount options* slider to **manually** so that your cluster has raw block devices to consume.  You'll receive a warning, which can be dismissed.
 7. Finally, click on create and buy
 ![how to create a volume](../how-to-create-volume.gif)
 
-Congratulations!  You have created a minimal production Kubernetes Cluster that can now be used to deploy KSD. 
+Congratulations!  You have created a minimal production Kubernetes Cluster that can now be used to deploy Rook. 
 
 >Note: To _destroy_ your cluster, detach all volumes from your worker nodes, delete them, thens navigate to the `demo-gitops/kubernetes-cluster-kubeone/terraform` directory, and run `terraform apply -destroy`.
