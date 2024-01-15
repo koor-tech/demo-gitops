@@ -210,7 +210,16 @@ INFO[17:32:33 UTC] Installing kubeadm...                         node=5.6.7.8 os
 
 ####  7. Add your volumes
 
-For this step, you will need to access to your [Hetzner Cloud account](https://accounts.hetzner.com/login).
+You can do this by using `volumizer.py` as follows:
+
+```console
+$ pip3 install hcloud
+$ ./volumizer.py -s 10
+There are no volumes attached to <worker name>. Creating and associating.
+Creating volume to Hetzner Cloud for <worker name>.
+```
+
+Alternatively, you can do this manually. For this step, you will need to access to your [Hetzner Cloud account](https://accounts.hetzner.com/login).
 
 >To utilize all of Rook's features, we recommend associating at least one volume with each data plane node.
 1. Navigate to the [Hetzner Cloud console](https://console.hetzner.cloud/)

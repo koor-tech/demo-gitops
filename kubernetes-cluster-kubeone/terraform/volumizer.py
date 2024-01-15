@@ -1,42 +1,39 @@
+#!/usr/bin/python3
+
+########
+#
+# volumizer.py, the simple and effective way of adding volumes to your cluster!
+# 
+# usage: ./volumizer.py -c <cluster name> -s <size>
+#
+# Relies on the hcloud python library:
+# $ pip3 install hcloud
+#
+
 import os
-import sys
-import getopt
+import argparse
 import re
 
 import hcloud
 
-expression = re.compile('pool', re.IGNORECASE)
-
-
 def create_and_associate_volume(client, worker, size):
+    volumeName = f"{worker.name}-vol-1"
     try:
-        response = client.volumes.create(size=size, name=f"${worker.name}-vol-1")
+        print(f"Creating volume to Hetzner Cloud for {worker.name}.")
+        response = client.volumes.create(size=size, name=volumeName, location=worker.datacenter)
     except hcloud.APIException:
         raise
     volume = response.volume
     volume.attach(worker)
 
-
-
 def parseOpts():
-    args = sys.argv[1:]
-    size = 10
-    name = "koor-generic"
-    try: 
-        opts, args = getopt.getopt(args, 's:h', ["size=", "help"])
-    except getopt.GetoptError:
-        print('Usage: volumizer.py --size <size in gigabytes>')
-        sys.exit(2)
+    parser = argparse.ArgumentParser()
 
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            print('Usage: volumizer.py --size <size in gigabytes>')
-            sys.exit()
-        if opt in ("-s", "--size"):
-            size = int(arg)
-    
-    return size
+    parser.add_argument("-s", "--size", type=int, default=10, help="the size of each worker's volume, in gigabyes")
+    parser.add_argument("-c", "--cluster-name", type=str, default="pool", help="the name of your cluster")
 
+    args = parser.parse_args()
+    return args.cluster_name, args.size
 
 if __name__ == "__main__":
     assert (
@@ -45,7 +42,10 @@ if __name__ == "__main__":
     token = os.environ["HCLOUD_TOKEN"]
     client = hcloud.Client(token=token)
 
-    size = parseOpts()
+    name, size = parseOpts()
+
+    inCluster = re.compile(f'{name}', re.IGNORECASE)
+    inPool = re.compile('pool', re.IGNORECASE)
 
     try:
         servers = client.servers.get_all()
@@ -53,13 +53,7 @@ if __name__ == "__main__":
         raise
 
     for i in range(len(servers)):
-        if expression.search(servers[i].name):
+        if inCluster.search(servers[i].name) and inPool.search(servers[i].name):
             if not servers[i].volumes:
-                print(f"No volumes attached to ${servers[i].name}.  Creating and associating.")
+                print(f"There are no volumes attached to {servers[i].name}. Creating and associating.")
                 create_and_associate_volume(client=client, worker=servers[i], size=size)
-
-
-
-    
-    
-
