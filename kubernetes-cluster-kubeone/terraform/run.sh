@@ -41,6 +41,8 @@ ssh_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= '{gsub(
 
 ssh_key_file="${ssh_key_file/#\~/$HOME}"
 
+# Extract worker volume size
+worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars.example | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 if ! [ -f "$ssh_key_file" ]; then
     echo "Error: SSH public key file '$ssh_key_file' not found."
@@ -75,7 +77,7 @@ kubeconfig(){
 
 run() {
     local choice
-    read -p "What do you want to do? (1: plan, 2: apply, 3: save infra, 4:deploy cluster, 5: export kubeconfig, other: exit): " choice
+    read -p "What do you want to do? (1: plan, 2: apply, 3: save infra, 4:deploy cluster, 5: export kubeconfig, 6: add volumes to workers, other: exit): " choice
     case $choice in
         1)
             # Run terraform plan
@@ -115,6 +117,11 @@ run() {
             kubeconfig
             run
             ;;                   
+        6)  # assign volumes
+            echo "Assigning volumes to worker nodes."
+            pip3 install hcloud
+            ./volumizer.py -c ${cluster_name} -s ${worker_volume_size}
+            ;;
         *)
             echo "Invalid exiting..."
             echo "The script has finished."
