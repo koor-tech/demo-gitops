@@ -5,14 +5,3 @@ versions:
 cloudProvider:
   hetzner: {}
   external: true
-
-clusterNetwork:
-  cni:
-    external: {}
-
-addons:
-  enable: true
-  addons:
-    - name: calico-vxlan
-      params:
-        MTU: "0" # auto-detect MTU

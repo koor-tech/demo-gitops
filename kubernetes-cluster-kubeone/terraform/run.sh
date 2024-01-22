@@ -29,6 +29,20 @@ else
     echo -e "Terraform initialized: \033[32m✔️\033[0m" 
 fi
 
+# check if kubeone is installed
+if ! command -v kubeone &> /dev/null; then
+  echo "Installing Kubeone..."
+  curl -sfL https://get.kubeone.io | sh
+  if ! command -v kubeone &> /dev/null; then
+    echo "unable to install kubeone please go to https://docs.kubermatic.com/kubeone/v1.7/tutorials/creating-clusters/ and install it"
+    exit 1
+  fi
+  # remove kubeone folder once if it was installed
+  find . -type d -name "kubeone_*" -exec rm -rf {} +
+fi
+
+echo -e "kubeone: \033[32m✔️\033[0m"
+
 # Copy terraform.tfvars.example to terraform.tfvars if it does not exists
 if [ -e "terraform.tfvars.example" ] && [ ! -e "terraform.tfvars" ]; then
     cp terraform.tfvars.example terraform.tfvars
