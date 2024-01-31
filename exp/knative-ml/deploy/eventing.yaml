@@ -8,3 +8,7 @@ kind: KnativeEventing
 metadata:
   name: knative-eventing
   namespace: knative-eventing
+spec:
+  source:
+    ceph:
+      enabled: true

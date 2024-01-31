@@ -12,7 +12,27 @@ kubectl apply -f deploy/serving.yaml
 kubectl patch service/kourier \
     -n knative-serving \
     --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-staging-kourier" }}}'
+kubectl apply -f deploy/eventing.yaml
 
+```
+
+### Check deployment
+```console
+$ kubectl get deployment -n knative-eventing
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+ceph-controller         1/1     1            1           44s
+ceph-webhook            1/1     1            1           43s
+eventing-controller     1/1     1            1           3m5s
+eventing-webhook        1/1     1            1           3m5s
+imc-controller          1/1     1            1           3m1s
+imc-dispatcher          1/1     1            1           3m
+mt-broker-controller    1/1     1            1           2m58s
+mt-broker-filter        1/1     1            1           2m59s
+mt-broker-ingress       1/1     1            1           2m59s
+pingsource-mt-adapter   0/0     0            0           3m5s
+$ kubectl get KnativeEventing knative-eventing -n knative-eventing
+NAME               VERSION   READY   REASON
+knative-eventing   1.11.5    True    
 ```
 
 ## Install knative func
