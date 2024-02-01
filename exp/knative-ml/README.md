@@ -44,6 +44,21 @@ kn func version
 ```
 
 ## Create bucket claim
+```console
+$ kubectl apply -f deploy/obc.yaml 
+$ kubectl describe objectbucketclaims.objectbucket.io
+Name:         knative-ml-inputs
+Namespace:    default
+...
+Spec:
+  Bucket Name:           ml-inputs-9f6e8659-7bb5-4534-8579-9930ac8236dd
+  Generate Bucket Name:  ml-inputs
+  Object Bucket Name:    obc-default-knative-ml-inputs
+  Storage Class Name:    ceph-bucket
+Status:
+  Phase:  Bound
+Events:   <none>
+```
 
 ## Create kantive function
 ```bash
