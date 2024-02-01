@@ -61,16 +61,53 @@ Events:   <none>
 ```
 
 ## Create kantive function
-```bash
-kn func create -l go ml
+```console
+$ kn func create -l python ml
+Created python function in /path/to/ml
+$ tree ml -a
+ml
+├── app.sh
+├── .func
+├── .funcignore
+├── func.py
+├── func.yaml
+├── .gitignore
+├── Procfile
+├── README.md
+├── requirements.txt
+└── test_func.py
 ```
+
+## Add configmaps and secrets to func
+Follow the prompts
+```console
+$ cd ml
+$ kn func config env add
+? What type of Environment variable do you want to add? ConfigMap: all key=value pairs as environment variables
+? Which ConfigMap do you want to use? knative-ml-inputs
+Environment variable entry was added to the function configuration
+$ kn func config env add
+? Where do you want to add the Environment variable? Insert here.
+? What type of Environment variable do you want to add? Secret: all key=value pairs as environment variables
+? Which Secret do you want to use? knative-ml-inputs
+Environment variable entry was added to the function configuration
+$ kn func config env
+Configured Environment variables:
+ -  All key=value pairs from ConfigMap "knative-ml-inputs"
+ -  All key=value pairs from Secret "knative-ml-inputs"
+```
+
+This adds the following to func.yaml
+```yaml
+run:
+  envs:
+  - value: '{{ configMap:knative-ml-inputs }}'
+  - value: '{{ secret:knative-ml-inputs }}'
+```
+
 
 ## Fill in code
 ...
-
-
-## Add bc to funcs
-
 
 ## Build and push kantive function
 ```bash
