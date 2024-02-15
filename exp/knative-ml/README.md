@@ -101,8 +101,26 @@ This adds the following to func.yaml
 ```yaml
 run:
   envs:
-  - value: '{{ configMap:knative-ml-inputs }}'
-  - value: '{{ secret:knative-ml-inputs }}'
+  - name: INPUTS_BUCKET_HOST
+    value: '{{ configMap:knative-ml-inputs:BUCKET_HOST }}'
+  - name: INPUTS_BUCKET_PORT
+    value: '{{ configMap:knative-ml-inputs:BUCKET_PORT }}'
+  - name: INPUTS_BUCKET_NAME
+    value: '{{ configMap:knative-ml-inputs:BUCKET_NAME }}'
+  - name: INPUTS_ACCESS_KEY_ID
+    value: '{{ configMap:knative-ml-inputs:AWS_ACCESS_KEY_ID }}'
+  - name: INPUTS_SECRET_ACCESS_KEY
+    value: '{{ configMap:knative-ml-inputs:AWS_SECRET_ACCESS_KEY }}'
+  - name: OUTPUTS_BUCKET_HOST
+    value: '{{ configMap:knative-ml-outputs:BUCKET_HOST }}'
+  - name: OUTPUTS_BUCKET_PORT
+    value: '{{ configMap:knative-ml-outputs:BUCKET_PORT }}'
+  - name: OUTPUTS_BUCKET_NAME
+    value: '{{ configMap:knative-ml-outputs:BUCKET_NAME }}'
+  - name: OUTPUTS_ACCESS_KEY_ID
+    value: '{{ configMap:knative-ml-outputs:AWS_ACCESS_KEY_ID }}'
+  - name: OUTPUTS_SECRET_ACCESS_KEY
+    value: '{{ configMap:knative-ml-outputs:AWS_SECRET_ACCESS_KEY }}'
 ```
 
 
@@ -111,7 +129,7 @@ run:
 
 ## Build and push kantive function
 ```bash
-cd producer
+cd ml
 kn func build --registry docker.io/<your_username>
 kn func deploy
 ```

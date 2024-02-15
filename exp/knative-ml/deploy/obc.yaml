@@ -5,3 +5,11 @@ metadata:
 spec:
   generateBucketName: ml-inputs
   storageClassName: ceph-bucket
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: knative-ml-outputs
+spec:
+  generateBucketName: ml-outputs
+  storageClassName: ceph-bucket

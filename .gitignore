@@ -39,3 +39,6 @@ tf.json
 # Generated from kubeone
 koor-demo-*-kubeconfig
 koor-demo-*.tar.gz
+
+# python virtual environment
+.venv
