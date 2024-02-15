@@ -2,7 +2,7 @@ from parliament import Context
 from flask import Request
 import os
 import boto3
-import random
+import tempfile
 
 in_endpoint = "http://" + os.environ["INPUTS_BUCKET_HOST"]
 in_bucket = os.environ["INPUTS_BUCKET_NAME"]
@@ -23,7 +23,16 @@ def main(context: Context):
     """ 
     Downloads an S3 file and outputs size
     """
-    in_s3.download_file(in_bucket, 'test', '/tmp/test')
-    ret = out_s3.upload_file('/tmp/test', out_bucket, 'test' + str(random.randint(1,100)))
+    if context.cloud_event is None:
+        return "A cloud event is required", 400
+    
+    event_attributes = context.cloud_event.get_attributes()
+    key = event_attributes['subject']
+    print("Copying "+ key, flush=True)
+    
+    tf = tempfile.NamedTemporaryFile()
+    
+    in_s3.download_file(in_bucket, key, tf.name)
+    ret = out_s3.upload_file(tf.name, out_bucket, key)
     return repr(ret), 200
 
