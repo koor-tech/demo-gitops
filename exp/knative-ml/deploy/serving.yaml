@@ -13,6 +13,8 @@ spec:
     kourier:
       enabled: true
   config:
+    autoscaler:
+      scale-to-zero-grace-period: "40s"
     domain:
       "knative-staging.koor.tech": ""
     network:
