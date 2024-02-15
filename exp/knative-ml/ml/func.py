@@ -2,6 +2,7 @@ from parliament import Context
 from flask import Request
 import os
 import boto3
+import random
 
 in_endpoint = "http://" + os.environ["INPUTS_BUCKET_HOST"]
 in_bucket = os.environ["INPUTS_BUCKET_NAME"]
@@ -22,6 +23,7 @@ def main(context: Context):
     """ 
     Downloads an S3 file and outputs size
     """
-    ret = in_s3.list_objects(Bucket=in_bucket)
+    in_s3.download_file(in_bucket, 'test', '/tmp/test')
+    ret = out_s3.upload_file('/tmp/test', out_bucket, 'test' + str(random.randint(1,100)))
     return repr(ret), 200
 
