@@ -1,4 +1,4 @@
-# Knative integration
+# Knative ML integration
 
 Idea: 
 - function triggered with S3 events when files are uploaded to input bucket, 
@@ -41,6 +41,11 @@ wget -O kn-func https://github.com/knative/func/releases/download/knative-v1.12.
 chmod +x kn-func 
 sudo mv kn-func /usr/local/bin
 kn func version
+```
+
+## Install s5cmd
+```bash
+brew install peak/tap/s5cmd
 ```
 
 ## Create bucket claim
@@ -126,6 +131,20 @@ run:
 
 ## Fill in code
 ...
+
+## Configure bucket
+```bash
+export BUCKET_NAME=$(kubectl -n default get cm ceph-bucket -o jsonpath='{.data.BUCKET_NAME}')
+export AWS_ACCESS_KEY_ID=$(kubectl -n default get secret ceph-bucket -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 --decode)
+export AWS_SECRET_ACCESS_KEY=$(kubectl -n default get secret ceph-bucket -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 --decode)
+
+mkdir ~/.aws
+cat > ~/.aws/credentials << EOF
+[default]
+aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+EOF
+```
 
 ## Build and push kantive function
 ```bash
