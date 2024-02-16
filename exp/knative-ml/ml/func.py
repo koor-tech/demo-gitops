@@ -32,7 +32,7 @@ def read_input_image(key: str) -> PIL.Image:
     Reads the image from the inputs bucket
     """
     file_byte_string = in_s3.get_object(Bucket=in_bucket, Key=key)["Body"].read()
-    image = PIL.Image.open(BytesIO(file_byte_string))
+    image = PIL.Image.open(io.BytesIO(file_byte_string))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
     return image
