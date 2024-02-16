@@ -1,5 +1,6 @@
 from parliament import Context
 import os
+import io
 import boto3
 import PIL
 import torch
@@ -20,7 +21,7 @@ out_s3 = boto3.client('s3',
     aws_secret_access_key=os.environ["OUTPUTS_SECRET_ACCESS_KEY"])
 
 model_id = "timbrooks/instruct-pix2pix"
-pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dtype=torch.float16, safety_checker=None)
+pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, safety_checker=None)
 pipe.to("cpu") # Change to cuda if you have a gpu
 pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
