@@ -1,9 +1,8 @@
-from parliament import Context
 import os
 import io
+from parliament import Context
 import boto3
 import PIL
-import torch
 from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
 
 in_endpoint = "http://" + os.environ["INPUTS_BUCKET_HOST"]
@@ -38,6 +37,9 @@ def read_input_image(key: str) -> PIL.Image:
     return image
 
 def write_output_image(image: PIL.Image, key: str):
+    """
+    Writes the image to the output bucket
+    """
     # Save the image to an in-memory file
     file = io.BytesIO()
     image.save(file, format=image.format)
@@ -53,14 +55,11 @@ def main(context: Context):
     """
     if context.cloud_event is None:
         return "A cloud event is required", 400
-    
+
     event_attributes = context.cloud_event.get_attributes()
     key = event_attributes['subject']
-    
+
     image = read_input_image(key)
     result_images = pipe(prompt, image=image, num_inference_steps=10, image_guidance_scale=1).images
     write_output_image(result_images[0], key)
-    
-    ret = out_s3.upload_file(tf.name, out_bucket, key)
     return "Done", 200
-
