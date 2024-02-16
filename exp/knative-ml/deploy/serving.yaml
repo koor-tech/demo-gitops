@@ -14,7 +14,8 @@ spec:
       enabled: true
   config:
     autoscaler:
-      scale-to-zero-grace-period: "40s"
+      # Helps with debugging
+      scale-to-zero-pod-retention-period: "20s"
     domain:
       "knative-staging.koor.tech": ""
     network:
