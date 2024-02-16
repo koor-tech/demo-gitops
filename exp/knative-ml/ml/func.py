@@ -5,7 +5,6 @@ import PIL
 import torch
 from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDiscreteScheduler
 
-
 in_endpoint = "http://" + os.environ["INPUTS_BUCKET_HOST"]
 in_bucket = os.environ["INPUTS_BUCKET_NAME"]
 in_s3 = boto3.client('s3',
@@ -25,7 +24,7 @@ pipe = StableDiffusionInstructPix2PixPipeline.from_pretrained(model_id, torch_dt
 pipe.to("cpu") # Change to cuda if you have a gpu
 pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
 
-prompt = "make into a cartoon"
+prompt = "turn it into a cartoon"
 
 def read_input_image(key: str) -> PIL.Image:
     """
