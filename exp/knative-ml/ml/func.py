@@ -36,9 +36,10 @@ def read_input_image(key: str) -> PIL.Image:
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
     print("Input image size is " + str(image.size))
+    print("Input image format is " + str(image.format))
     return image
 
-def write_output_image(image: PIL.Image, key: str, format):
+def write_output_image(image: PIL.Image, key: str, image_format):
     """
     Writes the image to the output bucket
     """
@@ -46,7 +47,7 @@ def write_output_image(image: PIL.Image, key: str, format):
     print("Output image size " + str(image.size))
     # Save the image to an in-memory file
     file = io.BytesIO()
-    image.save(file, format=format)
+    image.save(file, format='JPG')
     file.seek(0)
 
     # Upload image to s3
