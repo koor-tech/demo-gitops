@@ -30,16 +30,20 @@ def read_input_image(key: str) -> PIL.Image:
     """
     Reads the image from the inputs bucket
     """
+    print("Read input image")
     file_byte_string = in_s3.get_object(Bucket=in_bucket, Key=key)["Body"].read()
     image = PIL.Image.open(io.BytesIO(file_byte_string))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
+    print("Input image size is " + str(image.size))
     return image
 
 def write_output_image(image: PIL.Image, key: str):
     """
     Writes the image to the output bucket
     """
+    print("Write output image")
+    print("Output image size " + str(image.size))
     # Save the image to an in-memory file
     file = io.BytesIO()
     image.save(file, format=image.format)
@@ -47,6 +51,7 @@ def write_output_image(image: PIL.Image, key: str):
 
     # Upload image to s3
     out_s3.upload_fileobj(file, out_bucket, key)
+    print("File is uploaded")
 
 def main(context: Context):
     """ 
@@ -58,6 +63,7 @@ def main(context: Context):
 
     event_attributes = context.cloud_event.get_attributes()
     key = event_attributes['subject']
+    print("Key is " + key)
 
     image = read_input_image(key)
     result_images = pipe(prompt, image=image, num_inference_steps=10, image_guidance_scale=1).images
