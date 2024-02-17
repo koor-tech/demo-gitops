@@ -1,5 +1,6 @@
 import os
 import io
+import pathlib
 from parliament import Context
 import boto3
 import PIL
@@ -36,10 +37,9 @@ def read_input_image(key: str) -> PIL.Image:
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
     print("Input image size is " + str(image.size))
-    print("Input image format is " + str(image.format))
     return image
 
-def write_output_image(image: PIL.Image, key: str, image_format):
+def write_output_image(image: PIL.Image, key: str):
     """
     Writes the image to the output bucket
     """
@@ -47,7 +47,8 @@ def write_output_image(image: PIL.Image, key: str, image_format):
     print("Output image size " + str(image.size))
     # Save the image to an in-memory file
     file = io.BytesIO()
-    image.save(file, format='JPG')
+    file.name = pathlib.Path(key).name # Lets pillow figure out the file format
+    image.save(file)
     file.seek(0)
 
     # Upload image to s3
@@ -67,6 +68,6 @@ def main(context: Context):
     print("Key is " + key)
 
     image = read_input_image(key)
-    result_images = pipe(prompt, image=image, num_inference_steps=2, image_guidance_scale=1).images
-    write_output_image(result_images[0], key, image.format)
+    result_images = pipe(prompt, image=image, num_inference_steps=3, image_guidance_scale=1).images
+    write_output_image(result_images[0], key)
     return "Done", 200
