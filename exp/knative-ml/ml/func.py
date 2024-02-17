@@ -38,7 +38,7 @@ def read_input_image(key: str) -> PIL.Image:
     print("Input image size is " + str(image.size))
     return image
 
-def write_output_image(image: PIL.Image, key: str):
+def write_output_image(image: PIL.Image, key: str, format):
     """
     Writes the image to the output bucket
     """
@@ -46,7 +46,7 @@ def write_output_image(image: PIL.Image, key: str):
     print("Output image size " + str(image.size))
     # Save the image to an in-memory file
     file = io.BytesIO()
-    image.save(file, format=image.format)
+    image.save(file, format=format)
     file.seek(0)
 
     # Upload image to s3
@@ -66,6 +66,6 @@ def main(context: Context):
     print("Key is " + key)
 
     image = read_input_image(key)
-    result_images = pipe(prompt, image=image, num_inference_steps=10, image_guidance_scale=1).images
-    write_output_image(result_images[0], key)
+    result_images = pipe(prompt, image=image, num_inference_steps=2, image_guidance_scale=1).images
+    write_output_image(result_images[0], key, image.format)
     return "Done", 200
