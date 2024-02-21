@@ -12,6 +12,8 @@ helm repo update
 helm install --create-namespace --namespace rook-ceph rook-ceph rook-release/rook-ceph 
 helm install --namespace rook-ceph rook-ceph-cluster \
    --set operatorNamespace=rook-ceph rook-release/rook-ceph-cluster
+
+kubectl rook-ceph ceph status
 ```
 
 ## Install knative operator
@@ -156,6 +158,19 @@ kn func deploy
 ```
 
 ## Configure external bucket access
+```bash
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.13.1 \
+  --set installCRDs=true
+```
+
+
 ```bash
 kubectl apply -f deploy/ingress.yaml
 export S3_ENDPOINT_URL=https://demo-staging.koor.dev
