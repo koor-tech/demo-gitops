@@ -77,6 +77,8 @@ Events:   <none>
 ## Add ceph source and notifications
 ```bash
 kubectl apply -f deploy/notifications.yaml
+kubectl apply -f deploy/ceph-source.yaml
+kubectl apply -f deploy/trigger.yaml
 ```
 
 ## Create kantive function
