@@ -5,4 +5,6 @@ metadata:
     eventing.knative.dev/broker.class: MTChannelBasedBroker
   name: default
   namespace: default
-  
+spec:
+  delivery:
+    backoffDelay: P5M # 5 minutes
