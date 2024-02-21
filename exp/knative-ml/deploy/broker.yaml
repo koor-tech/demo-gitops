@@ -7,4 +7,4 @@ metadata:
   namespace: default
 spec:
   delivery:
-    timeout: P10M # 10 minutes
+    backoffDelay: P10M # 10 minutes
