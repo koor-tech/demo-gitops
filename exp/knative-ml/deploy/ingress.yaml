@@ -10,10 +10,10 @@ spec:
   ingressClassName: "nginx"
   tls:
     - hosts:
-        - demo-staging.koor.tech
+        - demo-staging.koor.dev
       secretName: rook-ceph-rgw-external
   rules:
-    - host: demo-staging.koor.tech
+    - host: demo-staging.koor.dev
       http:
         paths:
           - path: /
