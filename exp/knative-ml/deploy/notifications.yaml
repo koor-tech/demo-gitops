@@ -1,0 +1,23 @@
+apiVersion: ceph.rook.io/v1
+kind: CephBucketTopic
+metadata:
+  name: my-topic
+  namespace: default
+spec:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+  endpoint:
+    http:
+      uri: http://my-ceph-source-svc.default.svc:80
+      disableVerifySSL: true
+      sendCloudEvents: true
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBucketNotification
+metadata:
+  name: my-notification
+  namespace: default
+spec:
+  topic: my-topic
+  events:
+  - s3:ObjectCreated:*

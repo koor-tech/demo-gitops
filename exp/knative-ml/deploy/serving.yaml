@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: knative-serving
+---
+apiVersion: operator.knative.dev/v1beta1
+kind: KnativeServing
+metadata:
+  name: knative-serving
+  namespace: knative-serving
+spec:
+  ingress:
+    kourier:
+      enabled: true
+  config:
+    autoscaler:
+      # Helps with debugging
+      scale-to-zero-pod-retention-period: "20s"
+    domain:
+      "knative.koor.dev": ""
+    network:
+      ingress-class: "kourier.ingress.networking.knative.dev"

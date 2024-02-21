@@ -1,0 +1,10 @@
+controller:
+  config:
+    entries:
+        use-forwarded-headers: "true"
+        compute-full-forwarded-for: "true"
+        use-proxy-protocol: "true"
+  service:
+    annotations:
+      # This is the name of the load balancer just created
+      load-balancer.hetzner.cloud/name: "koor-demo-access"
