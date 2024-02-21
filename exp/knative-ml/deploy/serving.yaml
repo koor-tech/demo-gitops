@@ -17,6 +17,6 @@ spec:
       # Helps with debugging
       scale-to-zero-pod-retention-period: "20s"
     domain:
-      "knative-staging.koor.dev": ""
+      "knative.koor.dev": ""
     network:
       ingress-class: "kourier.ingress.networking.knative.dev"

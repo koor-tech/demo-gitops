@@ -22,7 +22,7 @@ kubectl apply -f deploy/operator.yaml
 kubectl apply -f deploy/serving.yaml
 kubectl patch service/kourier \
     -n knative-serving \
-    --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-staging-kourier" }}}'
+    --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-kourier" }}}'
 kubectl apply -f deploy/eventing.yaml
 
 ```
@@ -74,13 +74,6 @@ Spec:
 Status:
   Phase:  Bound
 Events:   <none>
-```
-
-## Add ceph source and notifications
-```bash
-kubectl apply -f deploy/notifications.yaml
-kubectl apply -f deploy/ceph-source.yaml
-kubectl apply -f deploy/trigger.yaml
 ```
 
 ## Create kantive function
@@ -157,6 +150,14 @@ kn func build --registry docker.io/<your_username>
 kn func deploy
 ```
 
+## Add ceph source and notifications
+```bash
+kubectl apply -f deploy/notifications.yaml
+kubectl apply -f deploy/broker.yaml
+kubectl apply -f deploy/trigger.yaml
+kubectl apply -f deploy/ceph-source.yaml
+```
+
 ## Configure external bucket access
 ```bash
 helm repo add jetstack https://charts.jetstack.io
@@ -168,12 +169,18 @@ helm install \
   --create-namespace \
   --version v1.13.1 \
   --set installCRDs=true
+
+kubectl apply -f deploy/issuers.yaml
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm -n ingress-nginx install ingress-nginx ingress-nginx/ingress-nginx --create-namespace -f deploy/nginx-values.yaml
 ```
 
 
 ```bash
 kubectl apply -f deploy/ingress.yaml
-export S3_ENDPOINT_URL=https://demo-staging.koor.dev
+export S3_ENDPOINT_URL=https://demo-s3.koor.dev
 
 export INPUTS_BUCKET_NAME=$(kubectl -n default get cm knative-ml-inputs -o jsonpath='{.data.BUCKET_NAME}')
 export INPUTS_ACCESS_KEY_ID=$(kubectl -n default get secret knative-ml-inputs -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 --decode)
