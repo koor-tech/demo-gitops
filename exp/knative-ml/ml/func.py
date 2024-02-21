@@ -68,6 +68,6 @@ def main(context: Context):
     print("Key is " + key)
 
     image = read_input_image(key)
-    result_images = pipe(prompt, image=image, num_inference_steps=3, image_guidance_scale=1).images
+    result_images = pipe(prompt, image=image, num_inference_steps=10, image_guidance_scale=1).images
     write_output_image(result_images[0], key)
     return "Done", 200

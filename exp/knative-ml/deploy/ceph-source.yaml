@@ -8,8 +8,8 @@ spec:
   sink:
     ref:
       apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: ml
+      kind: Broker
+      name: default
 ---
 apiVersion: v1
 kind: Service
