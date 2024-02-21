@@ -65,6 +65,11 @@ Status:
 Events:   <none>
 ```
 
+## Add ceph source and notifications
+```bash
+kubectl apply -f deploy/notifications.yaml
+```
+
 ## Create kantive function
 ```console
 $ kn func create -l python ml
@@ -132,20 +137,6 @@ run:
 ## Fill in code
 ...
 
-## Configure bucket
-```bash
-export BUCKET_NAME=$(kubectl -n default get cm ceph-bucket -o jsonpath='{.data.BUCKET_NAME}')
-export AWS_ACCESS_KEY_ID=$(kubectl -n default get secret ceph-bucket -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 --decode)
-export AWS_SECRET_ACCESS_KEY=$(kubectl -n default get secret ceph-bucket -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 --decode)
-
-mkdir ~/.aws
-cat > ~/.aws/credentials << EOF
-[default]
-aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
-EOF
-```
-
 ## Build and push kantive function
 ```bash
 cd ml
@@ -153,15 +144,52 @@ kn func build --registry docker.io/<your_username>
 kn func deploy
 ```
 
-## Invoke function
-```console
-$ kn func invoke
-TODO result
+## Configure external bucket access
+```bash
+kubectl apply -f deploy/ingress.yaml
+export S3_ENDPOINT_URL=https://demo-staging.koor.dev
+
+export INPUTS_BUCKET_NAME=$(kubectl -n default get cm knative-ml-inputs -o jsonpath='{.data.BUCKET_NAME}')
+export INPUTS_ACCESS_KEY_ID=$(kubectl -n default get secret knative-ml-inputs -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 --decode)
+export INPUTS_SECRET_ACCESS_KEY=$(kubectl -n default get secret knative-ml-inputs -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 --decode)
+
+export OUTPUTS_BUCKET_NAME=$(kubectl -n default get cm knative-ml-outputs -o jsonpath='{.data.BUCKET_NAME}')
+export OUTPUTS_ACCESS_KEY_ID=$(kubectl -n default get secret knative-ml-outputs -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 --decode)
+export OUTPUTS_SECRET_ACCESS_KEY=$(kubectl -n default get secret knative-ml-outputs -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 --decode)
+
+mkdir ~/.aws
+cat > ~/.aws/credentials << EOF
+[inputs]
+aws_access_key_id = ${INPUTS_ACCESS_KEY_ID}
+aws_secret_access_key = ${INPUTS_SECRET_ACCESS_KEY}
+
+[outputs]
+aws_access_key_id = ${OUTPUTS_ACCESS_KEY_ID}
+aws_secret_access_key = ${OUTPUTS_SECRET_ACCESS_KEY}
+EOF
 ```
 
-## Undeploy function
+## Invoke function
+```bash
+# upload
+s5cmd --profile inputs cp input-imgs/pexels-justin-shaifer.jpg s3://$INPUTS_BUCKET_NAME
+# list
+s5cmd --profile inputs ls s3://$INPUTS_BUCKET_NAME
+s5cmd --profile outputs ls s3://$OUTPUTS_BUCKET_NAME
+#download
+s5cmd --profile outputs cp s3://$OUTPUTS_BUCKET_NAME/pexels-justin-shaifer.jpg output-imgs/
+```
+
+## Check progress
 ```console
-$ kn func delete consumer
-Removing Knative Service: consumer
-Removing Knative Service 'consumer' and all dependent resources
+$ k logs -f ml-00003-deployment-5df4cdbbdf-cfs9t 
+...
+Loading pipeline components...: 100%|██████████| 6/6 [00:00<00:00,  9.07it/s], 364MB/s]
+Key is pexels-justin-shaifer.jpgors:  99%|█████████▉| 3.40G/3.44G [00:09<00:00, 364MB/s]
+Read input image
+Input image size is (640, 427)
+100%|██████████| 10/10 [00:56<00:00,  5.61s/it]
+Write output image
+Output image size (640, 424)
+File is uploaded
 ```
