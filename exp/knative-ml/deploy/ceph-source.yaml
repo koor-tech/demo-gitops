@@ -7,7 +7,7 @@ spec:
   port: "8888"
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
+      apiVersion: eventing.knative.dev/v1
       kind: Broker
       name: default
 ---
