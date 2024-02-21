@@ -5,6 +5,15 @@ Idea:
 - does some machine learning transformation
 - then outputs the files to output bucket
 
+## Install rook-ceph
+```bash
+helm repo add rook-release https://charts.rook.io/release
+helm repo update
+helm install --create-namespace --namespace rook-ceph rook-ceph rook-release/rook-ceph 
+helm install --namespace rook-ceph rook-ceph-cluster \
+   --set operatorNamespace=rook-ceph rook-release/rook-ceph-cluster
+```
+
 ## Install knative operator
 ```bash
 kubectl apply -f deploy/operator.yaml
