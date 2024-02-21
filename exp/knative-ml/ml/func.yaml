@@ -3,7 +3,7 @@ name: ml
 runtime: python
 registry: docker.io/zuhairkoor
 image: docker.io/zuhairkoor/ml:latest
-imageDigest: sha256:0e6db3538cabe82e484d3bef9668ef9c52beff7def6d9d10db159629c3e194ea
+imageDigest: sha256:db9bb5f723af8fd656c9181ab8c4705b905a62229277a1eec043cc4294307a10
 created: 2024-01-31T23:00:08.011134945-05:00
 build:
   builder: pack
