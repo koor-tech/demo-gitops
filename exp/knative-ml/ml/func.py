@@ -31,12 +31,12 @@ def read_input_image(key: str) -> PIL.Image:
     """
     Reads the image from the inputs bucket
     """
-    print("Read input image")
+    print("Read input image", flush=True)
     file_byte_string = in_s3.get_object(Bucket=in_bucket, Key=key)["Body"].read()
     image = PIL.Image.open(io.BytesIO(file_byte_string))
     image = PIL.ImageOps.exif_transpose(image)
     image = image.convert("RGB")
-    print("Input image size is " + str(image.size))
+    print("Input image size is " + str(image.size), flush=True)
     return image
 
 def write_output_image(image: PIL.Image, key: str):
@@ -44,7 +44,7 @@ def write_output_image(image: PIL.Image, key: str):
     Writes the image to the output bucket
     """
     print("Write output image")
-    print("Output image size " + str(image.size))
+    print("Output image size " + str(image.size), flush=True)
     # Save the image to an in-memory file
     file = io.BytesIO()
     file.name = pathlib.Path(key).name # Lets pillow figure out the file format
@@ -53,7 +53,7 @@ def write_output_image(image: PIL.Image, key: str):
 
     # Upload image to s3
     out_s3.upload_fileobj(file, out_bucket, key)
-    print("File is uploaded")
+    print("File is uploaded", flush=True)
 
 def main(context: Context):
     """ 
