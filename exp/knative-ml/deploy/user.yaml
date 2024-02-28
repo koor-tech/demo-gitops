@@ -1,11 +1,11 @@
 apiVersion: ceph.rook.io/v1
 kind: CephObjectStoreUser
 metadata:
-  name: my-user
+  name: ml-user
   namespace: rook-ceph
 spec:
   store: ceph-objectstore
   clusterNamespace: rook-ceph
-  displayName: my-display-name
+  displayName: ml-display-name
   capabilities:
     buckets: "*"
