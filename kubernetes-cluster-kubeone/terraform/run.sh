@@ -72,6 +72,10 @@ ssh_private_key_file=$(grep -E "^ssh_private_key_file" terraform.tfvars | awk -F
 
 ssh_private_key_file="${ssh_private_key_file/#\~/$HOME}"
 
+# Extract cluster_name from terraform.tfvars
+cluster_name=$(grep -E "^cluster_name" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
+
 # Check whether an ssh-agent is listening
 if [ -z "$SSH_AUTH_SOCK" ]; then
     echo "ssh-agent isn't running."
@@ -115,9 +119,6 @@ printf "+------------------------------------------+----------------------+\n"
 
 kubeconfig(){
     echo "export kubernetes configuration"
-
-    # Extract cluster_name from terraform.tfvars
-    cluster_name=$(grep -E "^cluster_name" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
     
     # Generate kubeconfig filename
     kubeconfig_file="${cluster_name}-kubeconfig"
@@ -175,7 +176,7 @@ run() {
         6)  # assign volumes
             echo "Assigning volumes to worker nodes."
             pip3 install hcloud
-            ./volumizer.py -c ${cluster_name} -s ${worker_volume_size}
+            ./volumizer.py -c "${cluster_name}" -s "${worker_volume_size}"
             ;;
         *)
             echo "Invalid exiting..."
