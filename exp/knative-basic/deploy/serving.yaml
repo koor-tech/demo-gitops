@@ -22,3 +22,10 @@ spec:
       kubernetes.podspec-persistent-volume-claim: "enabled"
       kubernetes.podspec-persistent-volume-write: "enabled"
       kubernetes.podspec-securitycontext: "enabled"
+  services:
+    - name: kourier
+      # Override annotations for the kourier service
+      annotations:
+        # A provider-specific annotation is necessary to access the functions using a load balancer
+        # For Hetzner it is:
+        load-balancer.hetzner.cloud/name: "koor-demo-kourier"
