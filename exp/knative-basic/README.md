@@ -10,10 +10,6 @@ This could be intermediate files in your image processing pipeline or [find appl
 ```bash
 kubectl apply -f deploy/operator.yaml
 kubectl apply -f deploy/serving.yaml
-kubectl patch service/kourier \
-    -n knative-serving \
-    --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-staging-kourier" }}}'
-
 ```
 
 ## Install knative func

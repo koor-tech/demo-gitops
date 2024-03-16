@@ -20,3 +20,10 @@ spec:
       "knative.koor.dev": ""
     network:
       ingress-class: "kourier.ingress.networking.knative.dev"
+  services:
+    - name: kourier
+      # Override annotations for the kourier service
+      annotations:
+        # A provider-specific annotation is necessary to access the functions using a load balancer
+        # For Hetzner it is:
+        load-balancer.hetzner.cloud/name: "koor-demo-kourier"

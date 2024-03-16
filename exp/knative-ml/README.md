@@ -20,9 +20,6 @@ kubectl rook-ceph ceph status
 ```bash
 kubectl apply -f deploy/operator.yaml
 kubectl apply -f deploy/serving.yaml
-kubectl patch service/kourier \
-    -n knative-serving \
-    --type merge -p '{"metadata": {"annotations": {"load-balancer.hetzner.cloud/name": "koor-demo-kourier" }}}'
 kubectl apply -f deploy/eventing.yaml
 
 ```
