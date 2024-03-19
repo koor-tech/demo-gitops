@@ -17,6 +17,11 @@ helm install --namespace rook-ceph rook-ceph-cluster \
 kubectl rook-ceph ceph status
 ```
 
+## Create OBC
+```bash
+kubectl apply -f deploy/obc.yaml
+```
+
 ## Install argocd
 ```bash
 # clone the deploykf repo
