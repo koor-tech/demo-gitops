@@ -44,9 +44,39 @@ spec:
         ##
         - name: "values"
           string: |
+            deploykf_core:
+              deploykf_profiles_generator:
+                profileDefaults:
+                  tools:
+                    kubeflowPipelines:
+                      objectStoreAuth:
+                        existingSecret: "kubeflow-pipelines"
+                        existingSecretNamespace: "kubeflow"
+                        existingSecretAccessKeyKey: "AWS_ACCESS_KEY_ID"
+                        existingSecretSecretKeyKey: "AWS_SECRET_ACCESS_KEY"
             deploykf_opt:
               deploykf_minio:
-                {} # <-- REMOVE THIS, IF YOU INCLUDE VALUES UNDER THIS SECTION!
+                enabled: false
+            kubeflow_tools:
+              pipelines:
+                bucket:
+                  name: kubeflow-pipelines
+                  region: ""
+
+                objectStore:
+                  useExternal: true
+                  host: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc
+                  port: "80"
+                  useSSL: false
+                  auth:
+                    existingSecret: "kubeflow-pipelines"
+                    existingSecretAccessKeyKey: "AWS_ACCESS_KEY_ID"
+                    existingSecretSecretKeyKey: "AWS_SECRET_ACCESS_KEY"
+
+                ## NOTE: only required if you are using 'sample-values.yaml' as a base
+                ##       as `minioFix` can only be 'true' when using the embedded MinIO
+                kfpV2:
+                  minioFix: false
 
   destination:
     server: "https://kubernetes.default.svc"
