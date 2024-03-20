@@ -45,6 +45,13 @@ spec:
         - name: "values"
           string: |
             deploykf_core:
+              deploykf_dashboard:
+                navigation:
+                  # [Optional] If Koor Data Control Center is used, you can add a link here
+                  externalLinks:
+                    - text: Koor Data Control Center
+                      url: http://localhost:8282
+                      icon: dashboard
               deploykf_profiles_generator:
                 profileDefaults:
                   tools:
