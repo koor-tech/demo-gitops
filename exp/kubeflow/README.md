@@ -95,5 +95,14 @@ kubectl port-forward \
 [TODO screenshot]
 
 ## Run an example
+Create a bucket
+```bash
+kubectl apply -f deploy/team-1-obc.yaml
+```
+Alternatively, if you'd like to allow users to create their own buckets, you can add an rbac rule:
+```bash
+kubectl apply -f deploy/team-1-rbac.yaml
+```
+Create a notebook [TODO screenshot]
 
 
