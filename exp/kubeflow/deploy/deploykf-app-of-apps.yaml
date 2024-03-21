@@ -45,6 +45,36 @@ spec:
         - name: "values"
           string: |
             deploykf_core:
+              deploykf_auth:
+              # [optional] allows access to rook's obc
+                extraManifests:
+                  - |
+                    apiVersion: rbac.authorization.k8s.io/v1
+                    kind: ClusterRole
+                    metadata:
+                      name: rook-obc-edit
+                      labels:
+                        helm.sh/chart: {{ include "deploykf-auth.labels.chart" . }}
+                        app.kubernetes.io/name: {{ include "deploykf-auth.labels.name" . }}
+                        app.kubernetes.io/instance: {{ .Release.Name }}
+                        app.kubernetes.io/managed-by: {{ .Release.Service }}
+                        app.kubernetes.io/component: cluster-rbac
+                        rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+                    rules:
+                      - apiGroups:
+                          - objectbucket.io
+                        resources:
+                          - objectbucketclaims
+                        verbs:
+                          - create
+                          - delete
+                          - deletecollection
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - watch
+
               deploykf_dashboard:
                 navigation:
                   # [Optional] If Koor Data Control Center is used, you can add a link here
@@ -52,6 +82,7 @@ spec:
                     - text: Koor Data Control Center
                       url: http://localhost:8282
                       icon: dashboard
+
               deploykf_profiles_generator:
                 profileDefaults:
                   tools:
@@ -61,9 +92,11 @@ spec:
                         existingSecretNamespace: "kubeflow"
                         existingSecretAccessKeyKey: "AWS_ACCESS_KEY_ID"
                         existingSecretSecretKeyKey: "AWS_SECRET_ACCESS_KEY"
+
             deploykf_opt:
               deploykf_minio:
                 enabled: false
+
             kubeflow_tools:
               pipelines:
                 bucket:
