@@ -32,6 +32,8 @@ Access `localhost:8282`
 kubectl apply -f deploy/obc.yaml
 ```
 
+![](pics/kdcc.png)
+
 ## Install argocd
 ```bash
 # clone the deploykf repo
@@ -46,6 +48,18 @@ chmod +x ./deploykf/argocd-plugin/install_argocd.sh
 bash ./deploykf/argocd-plugin/install_argocd.sh
 
 kubectl get po -n argocd
+```
+
+To access:
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8081:443
+```
+
+Access `localhost:8081`
+
+The initial password is: 
+```bash
+kubectl get -n argocd secret/argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
 ## Install app of apps
@@ -66,12 +80,7 @@ chmod +x ./deploykf/scripts/sync_argocd_apps.sh
 bash ./deploykf/scripts/sync_argocd_apps.sh
 ```
 
-or sync manually:
-```bash
-kubectl port-forward svc/argocd-server -n argocd 8081:443
-```
-Access `localhost:8081`
-[insert screenshot]
+![](pics/argocd.png)
 
 ## Access the platform
 Modify hosts:
@@ -91,18 +100,47 @@ kubectl port-forward \
   svc/deploykf-gateway 8080:http 8443:https
 ```
 
-[TODO login]
-[TODO screenshot]
+Go to deploykf.example.com
 
-## Run an example
-Create a bucket
+Username: user1@example.com
+Password: user1
+
+![](pics/dashboard.png)
+
+## Use in a notebook
+### Create a bucket
 ```bash
 kubectl apply -f deploy/team-1-obc.yaml
 ```
-Alternatively, if you'd like to allow users to create their own buckets, you can add an rbac rule:
+
+### Create a PodDefault 
 ```bash
-kubectl apply -f deploy/team-1-rbac.yaml
+kubectl apply -f deploy/pod-default-add-obc.yaml
 ```
-Create a notebook [TODO screenshot]
 
+When creating a notebook, select the configuration under advanced settings
 
+![](pics/notebook-config.png)
+
+In the notebook, install boto3
+```
+!pip install boto3
+```
+
+Then use it as follows
+```python
+import os
+import boto3
+
+aws_access_key_id = os.environ['AWS_ACCESS_KEY_ID']
+aws_secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
+endpoint_url = "http://" + os.environ['BUCKET_HOST']
+
+s3_client = boto3.client('s3', 
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    endpoint_url=endpoint_url,
+    use_ssl=False,
+)
+s3_client.list_buckets()
+```

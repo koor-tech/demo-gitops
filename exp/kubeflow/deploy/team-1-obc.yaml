@@ -1,8 +1,8 @@
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
-  name: mnist
+  name: team-1-bucket
   namespace: team-1
 spec:
-  generateBucketName: mnist
+  generateBucketName: team-1-bucket
   storageClassName: ceph-bucket

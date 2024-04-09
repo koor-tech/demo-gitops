@@ -56,7 +56,7 @@ ssh_public_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= 
 ssh_public_key_file="${ssh_public_key_file/#\~/$HOME}"
 
 # Extract worker volume size
-worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars.example | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 if ! [ -f "$ssh_public_key_file" ]; then
     echo "Error: SSH public key file '$ssh_public_key_file' not found."
