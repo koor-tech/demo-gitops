@@ -94,7 +94,7 @@ You will need to add the following lines to the END of your local /etc/hosts fil
 ```
 
 Port forward:
-```
+```bash
 kubectl port-forward \
   --namespace "deploykf-istio-gateway" \
   svc/deploykf-gateway 8080:http 8443:https
