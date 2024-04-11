@@ -1,13 +1,13 @@
 apiVersion: kubeflow.org/v1alpha1
 kind: PodDefault
 metadata:
-  name: add-bucket-config
+  name: add-team-1-bucket-access
   namespace: team-1
 spec:
   selector:
     matchLabels:
-      add-bucket-config: "true"
-  desc: "Add rook bucket"
+      add-team-1-bucket-access: "true"
+  desc: "Add team-1-bucket access"
   envFrom:
     - configMapRef:
         name: team-1-bucket
