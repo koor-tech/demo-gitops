@@ -210,3 +210,9 @@ Name of operating system profile for MachineDeployments, only applicable if oper
 If not specified, the default value will be added by machine-controller addon.
 EOF
 }
+
+variable "worker_volume_size" {
+  description = "The size of volumes to attach to workers"
+  default = "30G"
+  type    = string
+}

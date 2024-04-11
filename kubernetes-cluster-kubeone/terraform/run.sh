@@ -56,7 +56,7 @@ ssh_public_key_file=$(grep -E "^ssh_public_key_file" terraform.tfvars | awk -F= 
 ssh_public_key_file="${ssh_public_key_file/#\~/$HOME}"
 
 # Extract worker volume size
-worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars.example | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+worker_volume_size=$(grep -E "^worker_volume_size" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 if ! [ -f "$ssh_public_key_file" ]; then
     echo "Error: SSH public key file '$ssh_public_key_file' not found."
@@ -71,6 +71,10 @@ fi
 ssh_private_key_file=$(grep -E "^ssh_private_key_file" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 ssh_private_key_file="${ssh_private_key_file/#\~/$HOME}"
+
+# Extract cluster_name from terraform.tfvars
+cluster_name=$(grep -E "^cluster_name" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
+
 
 # Check whether an ssh-agent is listening
 if [ -z "$SSH_AUTH_SOCK" ]; then
@@ -115,9 +119,6 @@ printf "+------------------------------------------+----------------------+\n"
 
 kubeconfig(){
     echo "export kubernetes configuration"
-
-    # Extract cluster_name from terraform.tfvars
-    cluster_name=$(grep -E "^cluster_name" terraform.tfvars | awk -F= '{gsub(/[ \047"]/, "", $2); print $2}' | sed 's/^[ \t]*//;s/[ \t]*$//')
     
     # Generate kubeconfig filename
     kubeconfig_file="${cluster_name}-kubeconfig"
@@ -175,7 +176,7 @@ run() {
         6)  # assign volumes
             echo "Assigning volumes to worker nodes."
             pip3 install hcloud
-            ./volumizer.py -c ${cluster_name} -s ${worker_volume_size}
+            ./volumizer.py -c "${cluster_name}" -s "${worker_volume_size}"
             ;;
         *)
             echo "Invalid exiting..."

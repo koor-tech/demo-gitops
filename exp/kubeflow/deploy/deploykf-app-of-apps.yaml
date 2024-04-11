@@ -1,0 +1,123 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: deploykf-app-of-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: deploykf-app-of-apps
+    app.kubernetes.io/part-of: deploykf
+spec:
+  project: "default"
+  source:
+    ## source git repo configuration
+    ##  - we use the 'deploykf/deploykf' repo so we can read its 'sample-values.yaml'
+    ##    file, but you may use any repo (even one with no files)
+    ##
+    repoURL: "https://github.com/deployKF/deployKF.git"
+    targetRevision: "v0.1.4"
+    path: "."
+
+    ## plugin configuration
+    ##
+    plugin:
+      name: "deploykf"
+      parameters:
+
+        ## the deployKF generator version
+        ##  - available versions: https://github.com/deployKF/deployKF/releases
+        ##
+        - name: "source_version"
+          string: "0.1.4"
+
+        ## paths to values files within the `repoURL` repository
+        ##  - the values in these files are merged, with later files taking precedence
+        ##  - we strongly recommend using 'sample-values.yaml' as the base of your values
+        ##    so you can easily upgrade to newer versions of deployKF
+        ##
+        - name: "values_files"
+          array:
+            - "./sample-values.yaml"
+
+        ## a string containing the contents of a values file
+        ##  - this parameter allows defining values without needing to create a file in the repo
+        ##  - these values are merged with higher precedence than those defined in `values_files`
+        ##
+        - name: "values"
+          string: |
+            deploykf_core:
+              deploykf_auth:
+              # [optional] allows access to rook's obc
+                extraManifests:
+                  - |
+                    apiVersion: rbac.authorization.k8s.io/v1
+                    kind: ClusterRole
+                    metadata:
+                      name: rook-obc-edit
+                      labels:
+                        helm.sh/chart: {{ include "deploykf-auth.labels.chart" . }}
+                        app.kubernetes.io/name: {{ include "deploykf-auth.labels.name" . }}
+                        app.kubernetes.io/instance: {{ .Release.Name }}
+                        app.kubernetes.io/managed-by: {{ .Release.Service }}
+                        app.kubernetes.io/component: cluster-rbac
+                        rbac.authorization.kubeflow.org/aggregate-to-kubeflow-edit: "true"
+                    rules:
+                      - apiGroups:
+                          - objectbucket.io
+                        resources:
+                          - objectbucketclaims
+                        verbs:
+                          - create
+                          - delete
+                          - deletecollection
+                          - get
+                          - list
+                          - patch
+                          - update
+                          - watch
+
+              deploykf_dashboard:
+                navigation:
+                  # [Optional] If Koor Data Control Center is used, you can add a link here
+                  externalLinks:
+                    - text: Koor Data Control Center
+                      url: http://localhost:8282
+                      icon: dashboard
+
+              deploykf_profiles_generator:
+                profileDefaults:
+                  tools:
+                    kubeflowPipelines:
+                      objectStoreAuth:
+                        existingSecret: "kubeflow-pipelines"
+                        existingSecretNamespace: "kubeflow"
+                        existingSecretAccessKeyKey: "AWS_ACCESS_KEY_ID"
+                        existingSecretSecretKeyKey: "AWS_SECRET_ACCESS_KEY"
+
+            deploykf_opt:
+              deploykf_minio:
+                enabled: false
+
+            kubeflow_tools:
+              pipelines:
+                bucket:
+                  name: kubeflow-pipelines
+                  region: ""
+
+                objectStore:
+                  useExternal: true
+                  host: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc
+                  port: "80"
+                  useSSL: false
+                  auth:
+                    existingSecret: "kubeflow-pipelines"
+                    existingSecretAccessKeyKey: "AWS_ACCESS_KEY_ID"
+                    existingSecretSecretKeyKey: "AWS_SECRET_ACCESS_KEY"
+
+                ## NOTE: only required if you are using 'sample-values.yaml' as a base
+                ##       as `minioFix` can only be 'true' when using the embedded MinIO
+                kfpV2:
+                  minioFix: false
+
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: "argocd"
